@@ -1,0 +1,56 @@
+<!doctype html>
+<html><head>
+    <script src="/ClockSkew.js"></script>
+    <style>
+      .on {
+        background-color: white;
+        color: black;
+      }
+      body {
+          background-color: black;
+          color: white;
+          font-family: "Arial";
+      }
+    </style>
+</head><body>
+    <h1 id="title"></h1>
+    <script>
+        var context = new AudioContext();
+        var interval = 2000;
+
+        var clockSkew = new ClockSkew({
+          log:true,
+          getTime: function(){
+            return context.currentTime * 1000;
+          },
+          getServerTime: ClockSkew.getSocketTime('ws://localhost:9999')
+          //getServerTime: ClockSkew.getHttpTime.bind(null,'http://localhost:9999')
+        });
+        clockSkew.start();
+
+        var chord = [10,12,15,18]; //min 7th;
+        var note = 440;
+        var random = Math.floor(Math.random() * 4);
+
+        var f = note / chord[0] * chord[random];
+        document.getElementById('title').innerText = 'Synchronized playing of A-min7th (#'+(random+1)+'/4)';
+
+        setInterval(function(){
+            var osc = context.createOscillator(); 
+            osc.connect(context.destination); 
+            osc.frequency.value = f;
+
+            var now = context.currentTime * 1000;
+
+            var timeSinceLastBeep = now % interval;
+            var timeLastBeep = now - timeSinceLastBeep;
+            var timeToNextBeep = timeLastBeep + 2 * interval + (clockSkew.skew % interval);
+            var audioTime = timeToNextBeep / 1000;
+
+            osc.start(audioTime); 
+            osc.stop(audioTime + 0.2);
+        },interval);
+
+
+    </script>
+</body></html>

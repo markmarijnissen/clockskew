@@ -1,0 +1,35 @@
+{
+  "name": "clockskew",
+  "version": "0.1.0",
+  "description": "Websocket TimeServer and client library to calculate clock skew",
+  "main": "server.js",
+  "dependencies": {
+    "sockjs": "^0.3.15",
+    "faye-websocket": "^0.9.4",
+    "performance-now": "^0.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/markmarijnissen/clockskew.git"
+  },
+  "keywords": [
+    "clock",
+    "skew",
+    "clockskew",
+    "time",
+    "sync",
+    "synchronization",
+    "timestamp"
+  ],
+  "author": "Mark Marijnissen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/markmarijnissen/clockskew/issues"
+  },
+  "homepage": "https://github.com/markmarijnissen/clockskew"
+}
