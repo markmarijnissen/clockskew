@@ -1,6 +1,6 @@
 {
   "name": "clockskew",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Websocket TimeServer and client library to calculate clock skew",
   "main": "server.js",
   "hrtime":true,

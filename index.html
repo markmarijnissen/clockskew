@@ -1,6 +1,6 @@
 <!doctype html>
 <html><head>
-    <script src="/ClockSkew.js"></script>
+    <script src="/client.js"></script>
     <style>
       .on {
         background-color: white;
@@ -22,7 +22,7 @@
           getTime: function(){
             return context.currentTime * 1000;
           },
-          getServerTime: ClockSkew.getSockeTime('ws://localhost:9999/')
+          getServerTime: ClockSkew.getSocketTime('ws://localhost:9999/')
         });
         clockSkew.start();
 
@@ -38,8 +38,11 @@
             osc.connect(context.destination); 
             osc.frequency.value = f;
 
-            var now = context.currentTime * 1000;
 
+            // This time-stuff can be mind-bending.
+            // 
+            // But here is how to sync it:
+            var now = context.currentTime * 1000;
             var timeSinceLastBeep = now % interval;
             var timeLastBeep = now - timeSinceLastBeep;
             var timeToNextBeep = timeLastBeep + 2 * interval + (clockSkew.skew % interval);
