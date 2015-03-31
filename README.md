@@ -20,7 +20,7 @@ modulus deploy
 ## Client
 ```javascript
 var ClockSkew = require('clockskew/client');
-# or just include the file 
+// or just include the file 
 
 var clockSkew = new ClockSkew({
 	// REQUIRED :
