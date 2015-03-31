@@ -13,8 +13,8 @@ Use it to synchronize your apps with millisecond accuracy.
 git clone git@github.com:markmarijnissen/clockskew.git
 # run the server
 node server
-# or run online
-modules deploy
+# or run online (deploy to modulus.io)
+modulus deploy
 ```
 
 ## Client
@@ -26,9 +26,9 @@ var clockSkew = new ClockSkew({
 	// REQUIRED :
 
 	getServerTime: ClockSkew.getSocketTime('ws://...'),
-	# or use HTTP protocol
+	// or use HTTP protocol
 	getServerTime: ClockSkew.getHttpTime.bind(null,'http://'),
-	# or use Firebase
+	// or use Firebase
 	getServerTime: ClockSkew.getFirebaseTime.bind(null,'https://xxx.firebaseio.com')
 
 	// OPTIONAL:
