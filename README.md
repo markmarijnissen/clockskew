@@ -8,7 +8,7 @@ Use it to synchronize your apps with millisecond accuracy.
 
 ## Time Server
 
-```
+```bash
 # get the code
 git clone git@github.com:markmarijnissen/clockskew.git
 # run the server
@@ -18,7 +18,7 @@ modules deploy
 ```
 
 ## Client
-```
+```javascript
 var ClockSkew = require('clockskew/client');
 # or just include the file 
 
