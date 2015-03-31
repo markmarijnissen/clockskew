@@ -8,7 +8,12 @@ if(require('./package.json').hrtime === true) {
 
 var server = http.createServer();
 server.addListener('request', function(req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
+	res.writeHead(200, {
+ 		'Content-Type': 'text/plain',
+		'Access-Control-Allow-Origin': '*',
+		'Access-Control-Allow-Methods':'POST, GET',
+		'Access-Control-Allow-Credentials': true
+  	});
   res.end(now()+'');
 });
 
