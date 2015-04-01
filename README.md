@@ -59,6 +59,7 @@ clockSkew.skew;
 
 ## Changelog
 
+0.2.1 - Removed accidental console.log on stable clockskew value
 0.2.0 - Changed `ClockSkew.js` into `client.js`
 
 ## Contribute
