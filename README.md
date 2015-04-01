@@ -9,15 +9,23 @@ Use it to synchronize your apps with millisecond accuracy.
 ## Time Server
 
 ```bash
-# get the code
+# Clone from GIT
 git clone git@github.com:markmarijnissen/clockskew.git
-# run the server
 node server
-# or run online (deploy to modulus.io)
+
+# or get from NPM
+npm install clockskew
+node node_modules/clockskew/server
+
+# Deploy online (for example using modulus.io)
 modulus deploy
 ```
 
 ## Client
+```bash
+npm install clockskew
+```
+
 ```javascript
 var ClockSkew = require('clockskew/client');
 // or just include the file 
