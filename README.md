@@ -24,15 +24,13 @@ var ClockSkew = require('clockskew/client');
 
 var clockSkew = new ClockSkew({
 	// REQUIRED :
-
 	getServerTime: ClockSkew.getSocketTime('ws://...'),
 	// or use HTTP protocol
 	getServerTime: ClockSkew.getHttpTime.bind(null,'http://'),
 	// or use Firebase
-	getServerTime: ClockSkew.getFirebaseTime.bind(null,'https://xxx.firebaseio.com')
+	getServerTime: ClockSkew.getFirebaseTime.bind(null,'https://xxx.firebaseio.com/timestamp')
 
 	// OPTIONAL:
-
 	getTime: function(){...}, // get local time in ms.
 	timeout: 10000, // ping timeout
 	interval: 1000, // ping interval
@@ -43,10 +41,12 @@ var clockSkew = new ClockSkew({
 	minRttValues: 5 // minimum Round-Trip-Time values before rejecting RTTs that are more than 1 standard deviation slower
 	setTimeout: ... // custom setTimeout Implementation
 	clearTimeout: ... // custom clearTimeout implementation
+	onSkew: function(skew) { // do stuff },
 });
 
 clockSkew.start();
 clockSkew.stop();
+clockSkew.skew;
 ```
 
 ## Changelog

@@ -47,7 +47,7 @@
             var timeLastBeep = now - timeSinceLastBeep;
             var timeToNextBeep = timeLastBeep + 2 * interval + (clockSkew.skew % interval);
             var audioTime = timeToNextBeep / 1000;
-
+            
             osc.start(audioTime); 
             osc.stop(audioTime + 0.2);
         },interval);
