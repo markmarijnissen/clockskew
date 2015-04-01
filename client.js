@@ -223,7 +223,7 @@ ClockSkew.prototype.onServerTime = function(err,t){
 		averageSkewStd = std(this.avgSkewValues,average(this.avgSkewValues));
 		// YES, stable value. Schedule next check in later time
 		if(averageSkewStd < this.options.tolerance) {
-			console.log('clockSkew - stable value:',averageSkewStd);
+			if(this.options.log) console.log('clockSkew - stable value:',averageSkewStd);
 			interval = this.options.waitInterval;
 			//this.reset();
 		}
