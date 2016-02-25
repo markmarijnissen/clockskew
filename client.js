@@ -146,6 +146,7 @@ function ClockSkew(options){
 	this.timerId = 0;
 	this.calculate = this.calculate.bind(this);
 	this.onServerTime = this.onServerTime.bind(this);
+	this.promises = [];
 }
 
 ClockSkew.getTime = getTime;
@@ -157,6 +158,10 @@ ClockSkew.prototype.start = function(){
 	//this.reset();
 	if(this.timerId) this.clearTimeout(this.timerId);
 	this.timerId = this.setTimeout(this.calculate,this.options.interval || 1000);
+	var self = this;
+	return new Promise(function(resolve){
+		self.promises.push(resolve);
+	});
 };
 
 ClockSkew.prototype.calculate = function(){
@@ -226,6 +231,9 @@ ClockSkew.prototype.onServerTime = function(err,t){
 			if(this.options.log) console.log('clockSkew - stable value:',averageSkewStd);
 			interval = this.options.waitInterval;
 			//this.reset();
+			this.promises.forEach(function(resolve){
+				resolve(avg);
+			});
 		}
 	}
 
@@ -249,6 +257,29 @@ ClockSkew.prototype.reset = function(){
 
 ClockSkew.prototype.stop = function(){
 	this.clearTimeout(this.timerId);
+};
+
+ClockSkew.prototype.getTimeUntilNextCycle = function(interval){
+    var skewInCycle = this.skew % interval;
+    if(skewInCycle < 0) skewInCycle = interval + ofset;
+
+	var now = this.getTime();
+    var currentTimeInCycle = now % interval;
+    var startTimeOfLastCycle = now - currentTimeInCycle + skewInCycle;
+
+    var startTimeOfNextCycle = startTimeOfLastCycle + interval;
+    console.log('wait',startTimeOfNextCycle - now);
+    return startTimeOfNextCycle - now;
+};
+
+ClockSkew.prototype.onNextCycle = function(callback,interval){
+	setTimeout(callback,this.getTimeUntilNextCycle(interval));
+};
+
+ClockSkew.prototype.toServerTime = function toServerTime(time,skew){
+	time = time || this.getTime();
+	skew = skew || this.skew;
+	return time - skew;
 };
 
 if(typeof module !== 'undefined'){
