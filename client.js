@@ -22,75 +22,6 @@ function std(values,avg){
 	})));
 }
 
-function getHttpTime(url,getTime,callback) {
-	var start,end;
-	xhr = new XMLHttpRequest();
-  	xhr.open('GET', url);
-  	xhr.onreadystatechange = function() {
-  		if(xhr.readyState === 2){
-	    	end = getTime();
-	    } else if (xhr.readyState == 4) {
-	    	if(xhr.status === 200){
-	    		callback(null,[start,xhr.responseText * 1.0,end]);
-	    	} else {
-	    		callback(xhr.status,xhr.responseText);
-	    	}
-		}
-	};
-	xhr.send();
-	start = getTime();
-}
-
-function getFirebaseTime(url,getTime,callback) {
-	var ref = new Firebase(url);
-	var start = null;
-	ref.set(Firebase.ServerValue.TIMESTAMP);
-	ref.on('value',function(snap){
-		if(start === null){
-			start = getTime();
-		} else {
-			end = getTime();
-			callback(null,[start,snap.val(),end]);
-			ref.off();
-		}
-	});
-}
-
-function getSocketTime(url){
-	var websocket;
-	var queue = [];
-	function create(){
-		queue.splice(1);
-		if(websocket) websocket.close();
-		websocket = new WebSocket(url); 
-		websocket.onopen = function(){
-			websocket.send('?');
-		};
-		websocket.onmessage = function(e){
-			var stuff = queue.shift();
-			if(stuff){
-				stuff[0](null,[stuff[1],e.data,stuff[2]()]);	
-			}
-		};
-		websocket.onerror = function(){
-			websocket.close();
-			websocket = null;
-		};
-	}
-	
-	return function get(getTime,callback){
-		var start = getTime();
-		queue.push([callback,start,getTime]);
-		if(!websocket || websocket.readyState > 1) {
-			create();
-		} else {
-			websocket.send('?');	
-		}
-		
-	};
-}
-
-
 /**
  * CLIENT               SERVER
  *
@@ -125,7 +56,7 @@ function ClockSkew(options){
 	this.options = options = options || {};
 	this.options.timeout = options.timeout || 10000;
 	this.options.interval = options.interval || 1000;
-	this.options.waitInterval = options.waitInterval || this.options.interval * 30; // 30 sec
+	this.options.waitInterval = options.waitInterval || this.options.interval * 15; // 15 sec
 	this.options.minRttValues = options.minRttValues || 5;
 	this.options.minSkewValues = options.minSkewValues || 5;
 	this.options.history = options.history || 10;
@@ -133,8 +64,9 @@ function ClockSkew(options){
 	this.setTimeout = options.setTimeout || function(fn,time) { return setTimeout(fn,time); };
 	this.clearTimeout = options.clearTimeout || function(id) { return clearTimeout(id); };
 
+	this.getTime = options.getTime || getTime;
 	if(options.getServerTime){
-		this.getServerTime = options.getServerTime.bind(null,options.getTime || getTime);
+		this.getServerTime = options.getServerTime.bind(null,this.getTime);
 	} else {
 		throw new Error('getServerTime is a required option');
 	}
@@ -150,9 +82,6 @@ function ClockSkew(options){
 }
 
 ClockSkew.getTime = getTime;
-ClockSkew.getFirebaseTime = getFirebaseTime;
-ClockSkew.getHttpTime = getHttpTime;
-ClockSkew.getSocketTime = getSocketTime;
 
 ClockSkew.prototype.start = function(){
 	//this.reset();
@@ -259,17 +188,18 @@ ClockSkew.prototype.stop = function(){
 	this.clearTimeout(this.timerId);
 };
 
-ClockSkew.prototype.getTimeUntilNextCycle = function(interval){
-    var skewInCycle = this.skew % interval;
-    if(skewInCycle < 0) skewInCycle = interval + ofset;
+/**
+ * Utils
+ */
+ClockSkew.prototype.getTimeUntilNextCycle = function(interval,offset){
+    offset = offset || 0;
+    var serverTime = this.getTime() - this.skew;
 
-	var now = this.getTime();
-    var currentTimeInCycle = now % interval;
-    var startTimeOfLastCycle = now - currentTimeInCycle + skewInCycle;
+    var timeInCycle = serverTime % interval;
+    if(timeInCycle < 0) timeInCycle += interval;
 
-    var startTimeOfNextCycle = startTimeOfLastCycle + interval;
-    console.log('wait',startTimeOfNextCycle - now);
-    return startTimeOfNextCycle - now;
+    var timeUntilNextCycle = interval - timeInCycle;
+    return timeUntilNextCycle;
 };
 
 ClockSkew.prototype.onNextCycle = function(callback,interval){
@@ -284,7 +214,8 @@ ClockSkew.prototype.toServerTime = function toServerTime(time,skew){
 
 if(typeof module !== 'undefined'){
 	module.exports = ClockSkew;	
-} else {
+}
+if(typeof window !== 'undefined'){
 	window.ClockSkew = ClockSkew;
 }
 })();
