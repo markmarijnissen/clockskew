@@ -39,8 +39,7 @@
             osc.connect(context.destination); 
             osc.frequency.value = f;
 
-            var wait = clockSkew.getTimeUntilNextCycle(interval);
-            var audioTime = context.currentTime + (wait / 1000);
+            var audioTime = clockSkew.getTimeOfNextCycle(interval) / 1000;
 
             osc.start(audioTime); 
             osc.stop(audioTime + 0.2);

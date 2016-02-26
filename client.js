@@ -202,6 +202,18 @@ ClockSkew.prototype.getTimeUntilNextCycle = function(interval,offset){
     return timeUntilNextCycle;
 };
 
+ClockSkew.prototype.getTimeOfNextCycle = function(interval,offset){
+    offset = offset || 0;
+    var now = this.getTime();
+    var serverTime = now - this.skew + offset;
+
+    var timeInCycle = serverTime % interval;
+    if(timeInCycle < 0) timeInCycle += interval;
+
+    var timeUntilNextCycle = interval - timeInCycle;
+    return now + timeUntilNextCycle;
+};
+
 ClockSkew.prototype.onNextCycle = function(callback,interval){
 	setTimeout(callback,this.getTimeUntilNextCycle(interval));
 };
